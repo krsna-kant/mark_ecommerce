@@ -1,18 +1,37 @@
-version: 0.2
+pipeline:
+  agent: any
+  stages:
+    - stage: Clone Code
+      steps:
+        - git:
+            branch: 'main'
+            url: 'https://github.com/krsna-kant/mark_ecommerce.git'
 
-phases:
-  install:
-    commands:
-      - echo Installing dependencies...
-      - apt-get update -y
-  build:
-    commands:
-      - echo Building the application...
-      - make build
-  post_build:
-    commands:
-      - echo Build completed successfully!
-artifacts:
-  files:
-    - "**/*"
-  discard-paths: yes
+    - stage: Deploying Files To Apache
+      steps:
+        - sh: 'pwd'
+        - sh: 'sudo rm -rf /var/www/html/*'
+        - sh: 'sudo mv * /var/www/html/'
+
+    - stage: Restart Apache
+      steps:
+        - sh: 'sudo systemctl restart apache2'
+
+  post:
+    success:
+      - emailext:
+          to: 'kruns3629@gmail.com, abdallahq989@gmail.com'
+          subject: "Jenkins Pipeline Successful: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+          body: |
+            <p>The Jenkins pipeline <b>${env.JOB_NAME}</b> build number <b>${env.BUILD_NUMBER}</b> has completed successfully.</p>
+            <p>Check console output at <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+          mimeType: 'text/html'
+
+    failure:
+      - emailext:
+          to: 'kruns3629@gmail.com, abdallahq989@gmail.com'
+          subject: "Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}"
+          body: |
+            Build URL: ${env.BUILD_URL}
+            Build Number: ${env.BUILD_NUMBER}
+            Result: ${currentBuild.currentResult}
