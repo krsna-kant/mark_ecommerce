@@ -17,7 +17,7 @@ phases:
       - rm -rf /var/www/html/*
       - cp -r /tmp/mark_ecommerce/* /var/www/html/
 
- post_build:
+  post_build:
     commands:
       - echo "Restarting Apache service..."
       - apachectl -k restart || echo "Failed to restart Apache."
