@@ -2,8 +2,10 @@ version: 0.2
 
 phases:
   install:
-    runtime-versions:
-      git: 2.38
+  commands:
+    - echo "Installing Git..."
+    - yum install -y git
+
     commands:
       - echo "Installing dependencies and preparing environment..."
       - sudo yum install -y httpd  # Ensure Apache is installed
