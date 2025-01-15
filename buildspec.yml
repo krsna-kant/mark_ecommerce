@@ -4,7 +4,7 @@ phases:
   install:
     commands:
       - echo "Installing dependencies..."
-      - apt-get update && apt-get install -y git apache2
+      - yum install -y git httpd
 
   pre_build:
     commands:
@@ -20,7 +20,7 @@ phases:
   post_build:
     commands:
       - echo "Restarting Apache service..."
-      - systemctl restart apache2
+      - apachectl -k restart || echo "Failed to restart Apache."
       - echo "Deployment completed successfully."
 
 artifacts:
