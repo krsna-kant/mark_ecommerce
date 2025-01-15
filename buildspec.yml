@@ -1,37 +1,46 @@
-pipeline:
-  agent: any
-  stages:
-    - stage: Clone Code
-      steps:
-        - git:
-            branch: 'main'
-            url: 'https://github.com/krsna-kant/mark_ecommerce.git'
+version: 0.2
 
-    - stage: Deploying Files To Apache
-      steps:
-        - sh: 'pwd'
-        - sh: 'sudo rm -rf /var/www/html/*'
-        - sh: 'sudo mv * /var/www/html/'
+phases:
+  install:
+    runtime-versions:
+      git: 2.38
+    commands:
+      - echo "Installing dependencies and preparing environment..."
+      - sudo yum install -y httpd  # Ensure Apache is installed
 
-    - stage: Restart Apache
-      steps:
-        - sh: 'sudo systemctl restart apache2'
+  pre_build:
+    commands:
+      - echo "Cloning the repository..."
+      - git clone -b main https://github.com/krsna-kant/mark_ecommerce.git /tmp/mark_ecommerce
 
-  post:
-    success:
-      - emailext:
-          to: 'kruns3629@gmail.com, abdallahq989@gmail.com'
-          subject: "Jenkins Pipeline Successful: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-          body: |
-            <p>The Jenkins pipeline <b>${env.JOB_NAME}</b> build number <b>${env.BUILD_NUMBER}</b> has completed successfully.</p>
-            <p>Check console output at <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-          mimeType: 'text/html'
+  build:
+    commands:
+      - echo "Deploying files to Apache..."
+      - sudo rm -rf /var/www/html/*
+      - sudo cp -r /tmp/mark_ecommerce/* /var/www/html/
 
-    failure:
-      - emailext:
-          to: 'kruns3629@gmail.com, abdallahq989@gmail.com'
-          subject: "Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}"
-          body: |
-            Build URL: ${env.BUILD_URL}
-            Build Number: ${env.BUILD_NUMBER}
-            Result: ${currentBuild.currentResult}
+  post_build:
+    commands:
+      - echo "Restarting Apache service..."
+      - sudo systemctl restart httpd
+      - echo "Deployment completed successfully."
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: yes
+
+reports:
+  email:
+    files:
+      - "**/*"
+    base-directory: "/tmp/mark_ecommerce"
+    discard-paths: yes
+
+env:
+  variables:
+    DEPLOY_ENV: "production"
+
+cache:
+  paths:
+    - '/tmp/mark_ecommerce/**/*'
