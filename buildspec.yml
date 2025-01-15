@@ -3,9 +3,8 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo "Installing Git and dependencies..."
-      - yum install -y git
-      - sudo yum install -y httpd  # Ensure Apache is installed
+      - echo "Installing dependencies..."
+      - apt-get update && apt-get install -y git apache2
 
   pre_build:
     commands:
@@ -15,31 +14,16 @@ phases:
   build:
     commands:
       - echo "Deploying files to Apache..."
-      - sudo rm -rf /var/www/html/*
-      - sudo cp -r /tmp/mark_ecommerce/* /var/www/html/
+      - rm -rf /var/www/html/*
+      - cp -r /tmp/mark_ecommerce/* /var/www/html/
 
   post_build:
     commands:
       - echo "Restarting Apache service..."
-      - sudo systemctl restart httpd
+      - systemctl restart apache2
       - echo "Deployment completed successfully."
 
 artifacts:
   files:
     - '**/*'
   discard-paths: yes
-
-reports:
-  email:
-    files:
-      - "**/*"
-    base-directory: "/tmp/mark_ecommerce"
-    discard-paths: yes
-
-env:
-  variables:
-    DEPLOY_ENV: "production"
-
-cache:
-  paths:
-    - '/tmp/mark_ecommerce/**/*'
