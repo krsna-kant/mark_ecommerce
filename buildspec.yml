@@ -2,12 +2,9 @@ version: 0.2
 
 phases:
   install:
-  commands:
-    - echo "Installing Git..."
-    - yum install -y git
-
     commands:
-      - echo "Installing dependencies and preparing environment..."
+      - echo "Installing Git and dependencies..."
+      - yum install -y git
       - sudo yum install -y httpd  # Ensure Apache is installed
 
   pre_build:
