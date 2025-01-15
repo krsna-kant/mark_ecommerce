@@ -27,3 +27,5 @@ artifacts:
   files:
     - '**/*'
   discard-paths: yes
+  base-directory: '/var/www/html'  # Optionally specify the base directory for artifacts
+
