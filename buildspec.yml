@@ -27,5 +27,5 @@ artifacts:
   files:
     - '**/*'
   discard-paths: yes
-  base-directory: '/var/www/html'  # Optionally specify the base directory for artifacts
-
+  base-directory: '/var/www/html'  # Path where the build output resides
+  name: 'artifact-output'  # Output name for the artifact (valid S3 key)
